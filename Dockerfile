@@ -9,4 +9,4 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-Duser.timezone=Africa/Porto-Novo", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx320m", "-Xms128m", "-XX:+UseSerialGC", "-XX:TieredStopAtLevel=1", "-Duser.timezone=Africa/Porto-Novo", "-jar", "app.jar"]
