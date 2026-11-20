@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achats de matières - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('achats')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <h1>Achats de matières</h1>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="carte">
+            <h2>Enregistrer un achat</h2>
+            <p th:if="${#lists.isEmpty(matieres)}" class="vide">
+                Veuillez d'abord créer au moins une matière première avant d'enregistrer un achat.
+            </p>
+            <form th:if="${!#lists.isEmpty(matieres)}" th:action="@{/achats}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="matiereId">Matière achetée</label>
+                        <select id="matiereId" name="matiereId" required>
+                            <option th:each="m : ${matieres}" th:value="${m.id}" th:text="${m.code + ' - ' + m.nom + ' (' + m.unite.libelle + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="dateAchat">Date</label>
+                        <input type="date" id="dateAchat" name="dateAchat" th:value="${dateAujourdhui}" required>
+                    </div>
+                    <div class="champ">
+                        <label for="quantite">Quantité</label>
+                        <input type="number" id="quantite" name="quantite" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="champ">
+                        <label for="prixUnitaire">Prix unitaire (FCFA)</label>
+                        <input type="number" id="prixUnitaire" name="prixUnitaire" step="1" min="1" required>
+                    </div>
+                    <div class="champ">
+                        <label for="fournisseur">Fournisseur (facultatif)</label>
+                        <input type="text" id="fournisseur" name="fournisseur" maxlength="120">
+                    </div>
+                </div>
+                <p class="note">Chaque achat augmente le stock et met à jour le coût unitaire moyen pondéré. Un achat enregistré ne peut pas être modifié ni supprimé.</p>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Enregistrer l'achat</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte">
+            <h2>Historique des achats</h2>
+            <p th:if="${#lists.isEmpty(achats)}" class="vide">Aucun achat enregistré.</p>
+
+            <div th:if="${!#lists.isEmpty(achats)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Matière</th>
+                        <th class="nombre">Quantité</th>
+                        <th>Unité</th>
+                        <th class="nombre">Prix unitaire</th>
+                        <th class="nombre">Montant total</th>
+                        <th>Fournisseur</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="a : ${achats}">
+                        <td th:text="${#temporals.format(a.dateAchat, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td th:text="${a.matiere.code + ' - ' + a.matiere.nom}">Matière</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(a.quantite, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td th:text="${a.matiere.unite.libelle}">unité</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(a.prixUnitaire, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(a.montantTotal, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td th:text="${a.fournisseur != null ? a.fournisseur : '-'}">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

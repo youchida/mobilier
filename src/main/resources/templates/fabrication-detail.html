@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail de fabrication - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('fabrications')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <div>
+                <h1 th:text="${'Fabrication #' + fabrication.id + ' - ' + fabrication.modele.nom}">Fabrication</h1>
+                <p class="sous-titre">
+                    Code modèle : <strong th:text="${fabrication.modele.code}">CODE</strong> |
+                    Début : <strong th:text="${#temporals.format(fabrication.dateDebut, 'dd/MM/yyyy')}">01/01/2026</strong>
+                    <span th:if="${fabrication.dateFin != null}">
+                        | Fin : <strong th:text="${#temporals.format(fabrication.dateFin, 'dd/MM/yyyy')}">01/01/2026</strong>
+                    </span>
+                </p>
+            </div>
+            <div class="actions-ligne">
+                <span th:if="${fabrication.terminee}" class="badge badge-vert">Terminée (verrouillée)</span>
+                <span th:if="${!fabrication.terminee}" class="badge badge-jaune">En cours</span>
+                <a th:href="@{/fabrications}" class="btn btn-secondaire btn-petit">Retour à la liste</a>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="carte">
+            <h2>Synthèse des quantités et des coûts</h2>
+            <div class="resume-couts">
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Quantité prévue</div>
+                    <div class="bloc-resume-valeur" th:text="${fabrication.quantitePrevue}">0</div>
+                </div>
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Quantité réellement produite</div>
+                    <div class="bloc-resume-valeur" th:text="${fabrication.quantiteProduite != null ? fabrication.quantiteProduite : '-'}">-</div>
+                </div>
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Coût des matières</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(coutMatieres, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Coût de la main-d'œuvre</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(coutMainOeuvre, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Charges de fabrication</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(coutCharges, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+                <div class="bloc-resume">
+                    <div class="bloc-resume-label">Coût total</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(coutTotal, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+                <div class="bloc-resume" th:if="${coutRevientUnitaire != null}">
+                    <div class="bloc-resume-label">Coût de revient unitaire</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(coutRevientUnitaire, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+                <div class="bloc-resume" th:if="${ecartPrixVente != null}">
+                    <div class="bloc-resume-label">Prix habituel - Coût unitaire</div>
+                    <div class="bloc-resume-valeur" th:text="${#numbers.formatDecimal(ecartPrixVente, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+                </div>
+            </div>
+
+            <p th:if="${fabrication.observation != null}">
+                <strong>Observation :</strong> <span th:text="${fabrication.observation}"></span>
+            </p>
+            <p th:if="${ecartPrixVente != null}" class="note">
+                Prix de vente habituel du modèle :
+                <strong th:text="${#numbers.formatDecimal(fabrication.modele.prixVenteHabituel, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}"></strong>.
+                L'écart affiché est une différence simple entre ce prix et le coût de revient unitaire, hors charges générales de l'atelier.
+            </p>
+            <p th:if="${fabrication.terminee}" class="note">
+                Cette fabrication est terminée et verrouillée : ses consommations, sa main-d'œuvre et ses charges ne peuvent plus être modifiées.
+            </p>
+        </div>
+
+        <div class="grille-deux" th:if="${!fabrication.terminee}">
+            <div class="carte">
+                <h2>Ajouter une consommation de matière</h2>
+                <p th:if="${#lists.isEmpty(matieres)}" class="vide">Aucune matière première disponible.</p>
+                <form th:if="${!#lists.isEmpty(matieres)}" th:action="@{/fabrications/{id}/consommations(id=${fabrication.id})}" method="post">
+                    <div class="champ">
+                        <label for="matiereId">Matière première</label>
+                        <select id="matiereId" name="matiereId" required>
+                            <option th:each="m : ${matieres}"
+                                    th:value="${m.id}"
+                                    th:text="${m.code + ' - ' + m.nom + ' (stock : ' + #numbers.formatDecimal(m.stockActuel, 1, 'WHITESPACE', 2, 'COMMA') + ' ' + m.unite.libelle + ')'}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="quantiteCons">Quantité consommée</label>
+                        <input type="number" id="quantiteCons" name="quantite" step="0.01" min="0.01" required>
+                    </div>
+                    <p class="note">Le coût unitaire moyen actuel de la matière est figé au moment de la consommation.</p>
+                    <div class="actions-formulaire">
+                        <button type="submit" class="btn btn-principal">Ajouter la consommation</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="carte">
+                <h2>Ajouter de la main-d'œuvre</h2>
+                <form th:action="@{/fabrications/{id}/main-oeuvre(id=${fabrication.id})}" method="post">
+                    <div class="champ">
+                        <label for="nomOuvrier">Nom de l'ouvrier</label>
+                        <input type="text" id="nomOuvrier" name="nomOuvrier" required maxlength="120">
+                    </div>
+                    <div class="grille-formulaire">
+                        <div class="champ">
+                            <label for="duree">Durée</label>
+                            <input type="number" id="duree" name="duree" step="0.5" min="0.5" required>
+                        </div>
+                        <div class="champ">
+                            <label for="uniteDuree">Unité</label>
+                            <select id="uniteDuree" name="uniteDuree" required>
+                                <option value="jour(s)">jour(s)</option>
+                                <option value="heure(s)">heure(s)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="champ">
+                        <label for="montantMo">Montant (FCFA)</label>
+                        <input type="number" id="montantMo" name="montant" step="1" min="1" required>
+                    </div>
+                    <div class="actions-formulaire">
+                        <button type="submit" class="btn btn-principal">Ajouter la main-d'œuvre</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="grille-deux" th:if="${!fabrication.terminee}">
+            <div class="carte">
+                <h2>Ajouter une charge de fabrication</h2>
+                <form th:action="@{/fabrications/{id}/charges(id=${fabrication.id})}" method="post">
+                    <div class="champ">
+                        <label for="categorieCharge">Catégorie</label>
+                        <select id="categorieCharge" name="categorie" required>
+                            <option th:each="cat : ${categoriesCharge}" th:value="${cat}" th:text="${cat.libelle}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="montantCharge">Montant (FCFA)</label>
+                        <input type="number" id="montantCharge" name="montant" step="1" min="1" required>
+                    </div>
+                    <div class="champ">
+                        <label for="descriptionCharge">Description (facultative)</label>
+                        <input type="text" id="descriptionCharge" name="description" maxlength="300">
+                    </div>
+                    <div class="actions-formulaire">
+                        <button type="submit" class="btn btn-principal">Ajouter la charge</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="carte">
+                <h2>Terminer la fabrication</h2>
+                <form th:action="@{/fabrications/{id}/terminer(id=${fabrication.id})}" method="post">
+                    <div class="champ">
+                        <label for="dateFin">Date de fin</label>
+                        <input type="date" id="dateFin" name="dateFin" th:value="${dateAujourdhui}" required>
+                    </div>
+                    <div class="champ">
+                        <label for="quantiteProduite">Quantité réellement produite</label>
+                        <input type="number" id="quantiteProduite" name="quantiteProduite" min="1" step="1" th:value="${fabrication.quantitePrevue}" required>
+                    </div>
+                    <p class="note">Au moins une ligne de coût doit être enregistrée avant de clôturer. Une fois terminée, la fabrication est verrouillée.</p>
+                    <div class="actions-formulaire">
+                        <button type="submit" class="btn btn-principal">Terminer la fabrication</button>
+                    </div>
+                </form>
+
+                <div th:if="${peutSupprimer}" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e6eee9;">
+                    <form th:action="@{/fabrications/{id}/supprimer(id=${fabrication.id})}" method="post">
+                        <button type="submit" class="btn btn-danger btn-petit">Supprimer cette fabrication vide</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="carte">
+            <h2>Matières consommées</h2>
+            <p th:if="${#lists.isEmpty(consommations)}" class="vide">Aucune consommation de matière enregistrée.</p>
+            <div th:if="${!#lists.isEmpty(consommations)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Matière</th>
+                        <th class="nombre">Quantité</th>
+                        <th>Unité</th>
+                        <th class="nombre">Coût unitaire figé</th>
+                        <th class="nombre">Coût total</th>
+                        <th th:if="${!fabrication.terminee}">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${consommations}">
+                        <td th:text="${#temporals.format(c.dateConsommation, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td th:text="${c.matiere.code + ' - ' + c.matiere.nom}">Matière</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(c.quantite, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td th:text="${c.matiere.unite.libelle}">unité</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(c.coutUnitaireFige, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(c.coutTotal, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td th:if="${!fabrication.terminee}">
+                            <form th:action="@{/fabrications/{id}/consommations/{cid}/supprimer(id=${fabrication.id},cid=${c.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="carte">
+            <h2>Main-d'œuvre</h2>
+            <p th:if="${#lists.isEmpty(mainOeuvres)}" class="vide">Aucune ligne de main-d'œuvre enregistrée.</p>
+            <div th:if="${!#lists.isEmpty(mainOeuvres)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Ouvrier</th>
+                        <th class="nombre">Durée</th>
+                        <th>Unité</th>
+                        <th class="nombre">Montant</th>
+                        <th th:if="${!fabrication.terminee}">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="mo : ${mainOeuvres}">
+                        <td th:text="${mo.nomOuvrier}">Ouvrier</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(mo.duree, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td th:text="${mo.uniteDuree}">jour(s)</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(mo.montant, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td th:if="${!fabrication.terminee}">
+                            <form th:action="@{/fabrications/{id}/main-oeuvre/{mid}/supprimer(id=${fabrication.id},mid=${mo.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="carte">
+            <h2>Charges de fabrication</h2>
+            <p th:if="${#lists.isEmpty(charges)}" class="vide">Aucune charge de fabrication enregistrée.</p>
+            <div th:if="${!#lists.isEmpty(charges)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Description</th>
+                        <th class="nombre">Montant</th>
+                        <th th:if="${!fabrication.terminee}">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="ch : ${charges}">
+                        <td th:text="${ch.categorie.libelle}">Catégorie</td>
+                        <td th:text="${ch.description != null ? ch.description : '-'}">-</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(ch.montant, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td th:if="${!fabrication.terminee}">
+                            <form th:action="@{/fabrications/{id}/charges/{chid}/supprimer(id=${fabrication.id},chid=${ch.id})}" method="post">
+                                <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

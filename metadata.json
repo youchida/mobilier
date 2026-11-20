@@ -1,0 +1,6 @@
+{
+  "name": "Suivi Coûts Mobilier",
+  "description": "Application web Java Spring Boot de suivi des coûts de production de mobilier pour un atelier de menuiserie au Bénin.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

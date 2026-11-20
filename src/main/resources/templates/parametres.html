@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('parametres')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <h1>Paramètres</h1>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="grille-deux">
+            <div class="carte">
+                <h2>Informations de l'atelier</h2>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <form th:action="@{/parametres/atelier}" method="post">
+                        <div class="champ">
+                            <label for="nomAtelier">Nom de l'atelier</label>
+                            <input type="text" id="nomAtelier" name="nomAtelier" th:value="${atelier.nomAtelier}" required maxlength="120">
+                        </div>
+                        <div class="champ">
+                            <label for="commune">Commune</label>
+                            <input type="text" id="commune" name="commune" th:value="${atelier.commune}" required maxlength="100">
+                        </div>
+                        <div class="champ">
+                            <label for="telephone">Téléphone / Contact (facultatif)</label>
+                            <input type="text" id="telephone" name="telephone" th:value="${atelier.telephone}" maxlength="50">
+                        </div>
+                        <div class="champ">
+                            <label for="adresse">Adresse ou quartier (facultatif)</label>
+                            <input type="text" id="adresse" name="adresse" th:value="${atelier.adresse}" maxlength="200">
+                        </div>
+                        <div class="actions-formulaire">
+                            <button type="submit" class="btn btn-principal">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div sec:authorize="!hasRole('ADMIN')">
+                    <table>
+                        <tbody>
+                        <tr>
+                            <th>Nom de l'atelier</th>
+                            <td th:text="${atelier.nomAtelier}">Atelier</td>
+                        </tr>
+                        <tr>
+                            <th>Commune</th>
+                            <td th:text="${atelier.commune}">Commune</td>
+                        </tr>
+                        <tr>
+                            <th>Contact</th>
+                            <td th:text="${!#strings.isEmpty(atelier.telephone) ? atelier.telephone : '-'}">-</td>
+                        </tr>
+                        <tr>
+                            <th>Adresse</th>
+                            <td th:text="${!#strings.isEmpty(atelier.adresse) ? atelier.adresse : '-'}">-</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <p class="note">Seul l'administrateur peut modifier les informations de l'atelier.</p>
+                </div>
+            </div>
+
+            <div class="carte">
+                <h2>Modifier mon mot de passe</h2>
+                <form th:action="@{/parametres/mot-de-passe}" method="post">
+                    <div class="champ">
+                        <label for="motDePasseActuel">Mot de passe actuel</label>
+                        <input type="password" id="motDePasseActuel" name="motDePasseActuel" required>
+                    </div>
+                    <div class="champ">
+                        <label for="nouveauMotDePasse">Nouveau mot de passe (6 caractères min.)</label>
+                        <input type="password" id="nouveauMotDePasse" name="nouveauMotDePasse" required minlength="6">
+                    </div>
+                    <div class="champ">
+                        <label for="confirmationMotDePasse">Confirmer le nouveau mot de passe</label>
+                        <input type="password" id="confirmationMotDePasse" name="confirmationMotDePasse" required minlength="6">
+                    </div>
+                    <div class="actions-formulaire">
+                        <button type="submit" class="btn btn-principal">Mettre à jour le mot de passe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabrications - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('fabrications')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <h1>Fabrications</h1>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="carte">
+            <h2>Lancer une nouvelle fabrication</h2>
+            <p th:if="${#lists.isEmpty(modeles)}" class="vide">
+                Veuillez d'abord créer au moins un modèle de meuble.
+            </p>
+            <form th:if="${!#lists.isEmpty(modeles)}" th:action="@{/fabrications}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="modeleId">Modèle de meuble</label>
+                        <select id="modeleId" name="modeleId" required>
+                            <option th:each="mod : ${modeles}" th:value="${mod.id}" th:text="${mod.code + ' - ' + mod.nom}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="quantitePrevue">Quantité à produire</label>
+                        <input type="number" id="quantitePrevue" name="quantitePrevue" min="1" step="1" value="1" required>
+                    </div>
+                    <div class="champ">
+                        <label for="dateDebut">Date de début</label>
+                        <input type="date" id="dateDebut" name="dateDebut" th:value="${dateAujourdhui}" required>
+                    </div>
+                </div>
+                <div class="champ">
+                    <label for="observation">Observation (facultative)</label>
+                    <textarea id="observation" name="observation" rows="2" maxlength="500"></textarea>
+                </div>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Créer la fabrication</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte">
+            <h2>Liste des fabrications</h2>
+            <p th:if="${#lists.isEmpty(fabrications)}" class="vide">Aucune fabrication enregistrée.</p>
+
+            <div th:if="${!#lists.isEmpty(fabrications)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date début</th>
+                        <th>Modèle</th>
+                        <th class="nombre">Qté prévue</th>
+                        <th class="nombre">Qté produite</th>
+                        <th>Date fin</th>
+                        <th>Statut</th>
+                        <th class="nombre">Coût total</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="f : ${fabrications}">
+                        <td th:text="${#temporals.format(f.dateDebut, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td th:text="${f.modele.code + ' - ' + f.modele.nom}">Modèle</td>
+                        <td class="nombre" th:text="${f.quantitePrevue}">1</td>
+                        <td class="nombre" th:text="${f.quantiteProduite != null ? f.quantiteProduite : '-'}">-</td>
+                        <td th:text="${f.dateFin != null ? #temporals.format(f.dateFin, 'dd/MM/yyyy') : '-'}">-</td>
+                        <td>
+                            <span th:if="${f.terminee}" class="badge badge-vert">Terminée</span>
+                            <span th:if="${!f.terminee}" class="badge badge-jaune">En cours</span>
+                        </td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(coutsTotaux[f.id], 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td>
+                            <div class="actions-ligne">
+                                <a th:href="@{/fabrications/{id}(id=${f.id})}" class="btn btn-principal btn-petit">Détail</a>
+                                <form th:if="${suppressionsPossibles[f.id]}" th:action="@{/fabrications/{id}/supprimer(id=${f.id})}" method="post">
+                                    <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

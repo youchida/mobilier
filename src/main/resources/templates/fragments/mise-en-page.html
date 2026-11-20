@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="fr">
+<body>
+
+<div th:fragment="topbarMobile" class="topbar-mobile">
+    <span class="topbar-mobile-titre">Suivi Coûts Mobilier</span>
+    <button type="button" class="btn-menu-mobile" onclick="basculerMenu()">Menu</button>
+</div>
+
+<aside th:fragment="sidebar(pageActive)" id="sidebar" class="sidebar">
+    <div>
+        <div class="sidebar-entete">
+            <div class="sidebar-titre">Suivi Coûts Mobilier</div>
+            <div class="sidebar-atelier" th:text="${atelier.nomAtelier}">Atelier</div>
+            <div class="sidebar-commune" th:text="${atelier.commune}">Commune</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a th:href="@{/dashboard}" class="nav-lien" th:classappend="${pageActive == 'dashboard'} ? ' actif' : ''">Tableau de bord</a>
+            <a th:href="@{/matieres}" class="nav-lien" th:classappend="${pageActive == 'matieres'} ? ' actif' : ''">Matières premières</a>
+            <a th:href="@{/achats}" class="nav-lien" th:classappend="${pageActive == 'achats'} ? ' actif' : ''">Achats de matières</a>
+            <a th:href="@{/modeles}" class="nav-lien" th:classappend="${pageActive == 'modeles'} ? ' actif' : ''">Modèles de meubles</a>
+            <a th:href="@{/fabrications}" class="nav-lien" th:classappend="${pageActive == 'fabrications'} ? ' actif' : ''">Fabrications</a>
+            <a th:href="@{/charges-generales}" class="nav-lien" th:classappend="${pageActive == 'charges'} ? ' actif' : ''">Charges générales</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/administration}" class="nav-lien" th:classappend="${pageActive == 'administration'} ? ' actif' : ''">Administration</a>
+            <a th:href="@{/parametres}" class="nav-lien" th:classappend="${pageActive == 'parametres'} ? ' actif' : ''">Paramètres</a>
+        </nav>
+    </div>
+
+    <div class="sidebar-pied">
+        <div class="utilisateur-info" th:if="${utilisateurCourant != null}">
+            <div class="utilisateur-nom" th:text="${utilisateurCourant.nomComplet}">Utilisateur</div>
+            <div th:text="${utilisateurCourant.role.libelle}">Rôle</div>
+        </div>
+        <form th:action="@{/deconnexion}" method="post">
+            <button type="submit" class="btn-deconnexion">Se déconnecter</button>
+        </form>
+    </div>
+</aside>
+
+<div th:fragment="messages">
+    <div th:if="${succes}" class="message message-succes" th:text="${succes}"></div>
+    <div th:if="${erreur}" class="message message-erreur" th:text="${erreur}"></div>
+</div>
+
+</body>
+</html>

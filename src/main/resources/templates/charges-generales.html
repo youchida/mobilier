@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charges générales - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('charges')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <h1>Charges générales de l'atelier</h1>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="carte" th:if="${chargeEdition == null}">
+            <h2>Ajouter une charge générale</h2>
+            <form th:action="@{/charges-generales}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="dateCharge">Date</label>
+                        <input type="date" id="dateCharge" name="dateCharge" th:value="${dateAujourdhui}" required>
+                    </div>
+                    <div class="champ">
+                        <label for="categorie">Catégorie</label>
+                        <select id="categorie" name="categorie" required>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.libelle}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="montant">Montant (FCFA)</label>
+                        <input type="number" id="montant" name="montant" step="1" min="1" required>
+                    </div>
+                </div>
+                <div class="champ">
+                    <label for="description">Description (facultative)</label>
+                    <input type="text" id="description" name="description" maxlength="300">
+                </div>
+                <p class="note">Les charges générales ne sont pas incluses dans le coût de revient unitaire des fabrications.</p>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Enregistrer la charge</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte" th:if="${chargeEdition != null}">
+            <h2>Modifier une charge générale</h2>
+            <form th:action="@{/charges-generales/{id}/modifier(id=${chargeEdition.id})}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="dateChargeEdit">Date</label>
+                        <input type="date" id="dateChargeEdit" name="dateCharge" th:value="${chargeEdition.dateCharge}" required>
+                    </div>
+                    <div class="champ">
+                        <label for="categorieEdit">Catégorie</label>
+                        <select id="categorieEdit" name="categorie" required>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.libelle}" th:selected="${cat == chargeEdition.categorie}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="montantEdit">Montant (FCFA)</label>
+                        <input type="number" id="montantEdit" name="montant" step="1" min="1" th:value="${#numbers.formatDecimal(chargeEdition.montant, 1, 0)}" required>
+                    </div>
+                </div>
+                <div class="champ">
+                    <label for="descriptionEdit">Description (facultative)</label>
+                    <input type="text" id="descriptionEdit" name="description" th:value="${chargeEdition.description}" maxlength="300">
+                </div>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Enregistrer</button>
+                    <a th:href="@{/charges-generales}" class="btn btn-secondaire">Annuler</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte">
+            <h2>Liste des charges générales</h2>
+            <p th:if="${#lists.isEmpty(charges)}" class="vide">Aucune charge générale enregistrée.</p>
+
+            <div th:if="${!#lists.isEmpty(charges)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Catégorie</th>
+                        <th>Description</th>
+                        <th class="nombre">Montant</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${charges}">
+                        <td th:text="${#temporals.format(c.dateCharge, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td th:text="${c.categorie.libelle}">Catégorie</td>
+                        <td th:text="${c.description != null ? c.description : '-'}">-</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(c.montant, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td>
+                            <div class="actions-ligne">
+                                <a th:href="@{/charges-generales(modifierId=${c.id})}" class="btn btn-secondaire btn-petit">Modifier</a>
+                                <form th:action="@{/charges-generales/{id}/supprimer(id=${c.id})}" method="post">
+                                    <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

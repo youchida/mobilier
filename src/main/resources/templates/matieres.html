@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matières premières - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('matieres')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <h1>Matières premières</h1>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="carte" th:if="${matiereEdition == null}">
+            <h2>Nouvelle matière première</h2>
+            <form th:action="@{/matieres}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="code">Code unique</label>
+                        <input type="text" id="code" name="code" required maxlength="30" placeholder="Ex : BOIS-TECK">
+                    </div>
+                    <div class="champ">
+                        <label for="nom">Nom</label>
+                        <input type="text" id="nom" name="nom" required maxlength="120" placeholder="Ex : Planche de teck">
+                    </div>
+                    <div class="champ">
+                        <label for="categorie">Catégorie</label>
+                        <select id="categorie" name="categorie" required>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.libelle}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="unite">Unité de mesure</label>
+                        <select id="unite" name="unite" required>
+                            <option th:each="u : ${unites}" th:value="${u}" th:text="${u.libelle}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="seuilAlerte">Seuil d'alerte</label>
+                        <input type="number" id="seuilAlerte" name="seuilAlerte" step="0.01" min="0" value="0" required>
+                    </div>
+                </div>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Ajouter la matière</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte" th:if="${matiereEdition != null}">
+            <h2>Modifier la matière : <span th:text="${matiereEdition.code}"></span></h2>
+            <form th:action="@{/matieres/{id}/modifier(id=${matiereEdition.id})}" method="post">
+                <div class="grille-formulaire">
+                    <div class="champ">
+                        <label for="codeEdit">Code unique</label>
+                        <input type="text" id="codeEdit" name="code" th:value="${matiereEdition.code}" required maxlength="30">
+                    </div>
+                    <div class="champ">
+                        <label for="nomEdit">Nom</label>
+                        <input type="text" id="nomEdit" name="nom" th:value="${matiereEdition.nom}" required maxlength="120">
+                    </div>
+                    <div class="champ">
+                        <label for="categorieEdit">Catégorie</label>
+                        <select id="categorieEdit" name="categorie" required>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat.libelle}" th:selected="${cat == matiereEdition.categorie}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="uniteEdit">Unité de mesure</label>
+                        <select id="uniteEdit" name="unite" required>
+                            <option th:each="u : ${unites}" th:value="${u}" th:text="${u.libelle}" th:selected="${u == matiereEdition.unite}"></option>
+                        </select>
+                    </div>
+                    <div class="champ">
+                        <label for="seuilAlerteEdit">Seuil d'alerte</label>
+                        <input type="number" id="seuilAlerteEdit" name="seuilAlerte" step="0.01" min="0" th:value="${matiereEdition.seuilAlerte}" required>
+                    </div>
+                </div>
+                <p class="note">Le stock et le coût unitaire moyen sont calculés automatiquement par les achats et les consommations.</p>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal">Enregistrer</button>
+                    <a th:href="@{/matieres}" class="btn btn-secondaire">Annuler</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="carte">
+            <h2>Liste des matières premières</h2>
+            <form th:action="@{/matieres}" method="get" class="barre-recherche">
+                <input type="text" name="recherche" th:value="${recherche}" placeholder="Rechercher par nom ou par code">
+                <button type="submit" class="btn btn-principal">Rechercher</button>
+                <a th:if="${!#strings.isEmpty(recherche)}" th:href="@{/matieres}" class="btn btn-secondaire">Effacer</a>
+            </form>
+
+            <p th:if="${#lists.isEmpty(matieres)}" class="vide">Aucune matière première trouvée.</p>
+
+            <div th:if="${!#lists.isEmpty(matieres)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Nom</th>
+                        <th>Catégorie</th>
+                        <th>Unité</th>
+                        <th class="nombre">Stock actuel</th>
+                        <th class="nombre">Seuil d'alerte</th>
+                        <th class="nombre">Coût moyen</th>
+                        <th>État</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${matieres}" th:classappend="${m.stockBas} ? 'ligne-alerte' : ''">
+                        <td th:text="${m.code}">CODE</td>
+                        <td th:text="${m.nom}">Nom</td>
+                        <td th:text="${m.categorie.libelle}">Catégorie</td>
+                        <td th:text="${m.unite.libelle}">unité</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(m.stockActuel, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(m.seuilAlerte, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(m.coutUnitaireMoyen, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td>
+                            <span th:if="${m.stockBas}" class="badge badge-rouge">Stock bas</span>
+                            <span th:if="${!m.stockBas}" class="badge badge-vert">Disponible</span>
+                        </td>
+                        <td>
+                            <a th:href="@{/matieres(modifierId=${m.id})}" class="btn btn-secondaire btn-petit">Modifier</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

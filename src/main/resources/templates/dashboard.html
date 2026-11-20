@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/mise-en-page :: topbarMobile}"></div>
+<div class="layout">
+    <aside th:replace="~{fragments/mise-en-page :: sidebar('dashboard')}"></aside>
+
+    <main class="contenu-principal">
+        <div class="entete-page">
+            <div>
+                <h1>Tableau de bord</h1>
+                <p class="sous-titre">Mois en cours : <strong th:text="${indicateurs.moisCourant}">mois</strong></p>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/mise-en-page :: messages}"></div>
+
+        <div class="grille-kpi">
+            <div class="kpi-carte">
+                <div class="kpi-label">Fabrications terminées du mois</div>
+                <div class="kpi-valeur" th:text="${indicateurs.nbFabricationsTermineesMois}">0</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Meubles produits du mois</div>
+                <div class="kpi-valeur" th:text="${indicateurs.nbMeublesProduitsMois}">0</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Matières consommées du mois</div>
+                <div class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.coutMatieresMois, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Main-d'œuvre du mois</div>
+                <div class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.coutMainOeuvreMois, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Charges de production du mois</div>
+                <div class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.chargesProductionMois, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Coût total de production du mois</div>
+                <div class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.coutTotalProductionMois, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+            </div>
+            <div class="kpi-carte">
+                <div class="kpi-label">Valeur actuelle du stock</div>
+                <div class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.valeurStockActuel, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</div>
+            </div>
+            <div class="kpi-carte" th:classappend="${indicateurs.nbMatieresStockBas > 0} ? ' alerte' : ''">
+                <div class="kpi-label">Matières en stock bas</div>
+                <div class="kpi-valeur" th:text="${indicateurs.nbMatieresStockBas}">0</div>
+            </div>
+        </div>
+
+        <div class="carte">
+            <h2>Charges générales du mois (hors coût de revient des fabrications)</h2>
+            <p class="kpi-valeur" th:text="${#numbers.formatDecimal(indicateurs.chargesGeneralesMois, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</p>
+            <p class="note">Électricité, eau, loyer, transport général et autres frais de l'atelier pour le mois en cours.</p>
+        </div>
+
+        <div class="carte">
+            <h2>Matières premières à réapprovisionner</h2>
+            <p th:if="${#lists.isEmpty(indicateurs.matieresStockBas)}" class="vide">
+                Aucune matière n'est en dessous ou au niveau de son seuil d'alerte.
+            </p>
+            <div th:if="${!#lists.isEmpty(indicateurs.matieresStockBas)}" class="conteneur-tableau">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Matière</th>
+                        <th>Catégorie</th>
+                        <th class="nombre">Stock actuel</th>
+                        <th class="nombre">Seuil d'alerte</th>
+                        <th>Unité</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="matiere : ${indicateurs.matieresStockBas}" class="ligne-alerte">
+                        <td th:text="${matiere.code}">CODE</td>
+                        <td th:text="${matiere.nom}">Nom</td>
+                        <td th:text="${matiere.categorie.libelle}">Catégorie</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(matiere.stockActuel, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(matiere.seuilAlerte, 1, 'WHITESPACE', 2, 'COMMA')}">0</td>
+                        <td th:text="${matiere.unite.libelle}">unité</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

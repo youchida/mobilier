@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erreur - Suivi Coûts Mobilier</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="page-connexion">
+    <div class="carte-connexion">
+        <h1>Une erreur est survenue</h1>
+        <p class="sous-titre" th:text="${status != null ? 'Code : ' + status : 'Opération impossible.'}">Erreur</p>
+        <div class="actions-formulaire">
+            <a th:href="@{/dashboard}" class="btn btn-principal" style="width: 100%;">Retour au tableau de bord</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
