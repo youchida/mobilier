@@ -178,7 +178,7 @@
                     </div>
                 </form>
 
-                <div th:if="${peutSupprimer}" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #e6eee9;">
+                <div th:if="${peutSupprimer}" style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #efe7dc;">
                     <form th:action="@{/fabrications/{id}/supprimer(id=${fabrication.id})}" method="post">
                         <button type="submit" class="btn btn-danger btn-petit">Supprimer cette fabrication vide</button>
                     </form>
