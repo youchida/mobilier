@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,11 +40,8 @@ public class FabricationController {
 
     @GetMapping
     public String lister(Model model) {
-        List<Fabrication> fabrications = fabricationService.listerToutes();
         model.addAttribute("pageActive", "fabrications");
-        model.addAttribute("fabrications", fabrications);
-        model.addAttribute("coutsTotaux", fabricationService.carteCoutsTotaux(fabrications));
-        model.addAttribute("suppressionsPossibles", fabricationService.carteSuppressionsPossibles(fabrications));
+        model.addAttribute("lignes", fabricationService.listerResumes());
         model.addAttribute("modeles", modeleMeubleService.listerTous());
         model.addAttribute("dateAujourdhui", LocalDate.now(ZONE_BENIN));
         return "fabrications";

@@ -52,6 +52,18 @@ public class FabricationService {
         return fabricationRepository.findAllByOrderByDateDebutDescIdDesc();
     }
 
+    public List<LigneFabrication> listerResumes() {
+        List<Fabrication> fabrications = listerToutes();
+        List<LigneFabrication> resumes = new java.util.ArrayList<>();
+        for (Fabrication fabrication : fabrications) {
+            BigDecimal total = calculerCoutMatieres(fabrication.getId())
+                    .add(calculerCoutMainOeuvre(fabrication.getId()))
+                    .add(calculerCoutCharges(fabrication.getId()));
+            resumes.add(new LigneFabrication(fabrication, total, peutEtreSupprimee(fabrication)));
+        }
+        return resumes;
+    }
+
     public Map<Long, BigDecimal> carteCoutsTotaux(List<Fabrication> fabrications) {
         Map<Long, BigDecimal> map = new HashMap<>();
         for (Fabrication fabrication : fabrications) {
@@ -69,6 +81,31 @@ public class FabricationService {
             map.put(fabrication.getId(), peutEtreSupprimee(fabrication));
         }
         return map;
+    }
+
+    public static class LigneFabrication {
+
+        private final Fabrication fabrication;
+        private final BigDecimal coutTotal;
+        private final boolean peutSupprimer;
+
+        public LigneFabrication(Fabrication fabrication, BigDecimal coutTotal, boolean peutSupprimer) {
+            this.fabrication = fabrication;
+            this.coutTotal = coutTotal;
+            this.peutSupprimer = peutSupprimer;
+        }
+
+        public Fabrication getFabrication() {
+            return fabrication;
+        }
+
+        public BigDecimal getCoutTotal() {
+            return coutTotal;
+        }
+
+        public boolean isPeutSupprimer() {
+            return peutSupprimer;
+        }
     }
 
     public Fabrication trouverParId(Long id) {

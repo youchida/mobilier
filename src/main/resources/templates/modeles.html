@@ -12,8 +12,13 @@
     <aside th:replace="~{fragments/mise-en-page :: sidebar('modeles')}"></aside>
 
     <main class="contenu-principal">
-        <div class="entete-page">
-            <h1>Modèles de meubles</h1>
+        <div class="banniere-visuelle" style="background-image: url('/images/meubles-catalogue.jpg');">
+            <div class="banniere-contenu">
+                <div>
+                    <h1>Modèles de meubles</h1>
+                    <p>Catalogue des modèles fabriqués par l'atelier et prix de vente habituels.</p>
+                </div>
+            </div>
         </div>
 
         <div th:replace="~{fragments/mise-en-page :: messages}"></div>

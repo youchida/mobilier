@@ -7,32 +7,63 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div class="page-connexion">
-    <div class="carte-connexion">
-        <h1>Suivi Coûts Mobilier</h1>
-        <p class="sous-titre" th:text="${atelier.nomAtelier + ' - ' + atelier.commune}">Atelier de Menuiserie</p>
+<div class="connexion-split">
+    <section class="connexion-gauche">
+        <div class="connexion-gauche-contenu">
+            <div class="connexion-marque">
+                <div class="connexion-logo">
+                    <img th:src="@{/images/logo.jpg}" alt="Logo Suivi Coûts Mobilier">
+                </div>
+                <div>
+                    <h1>Suivi Coûts Mobilier</h1>
+                    <p class="connexion-atelier" th:text="${atelier.nomAtelier + ' — ' + atelier.commune}">Atelier de Menuiserie</p>
+                </div>
+            </div>
 
-        <div th:if="${param.erreur}" class="message message-erreur">
-            Adresse de connexion ou mot de passe incorrect.
-        </div>
-        <div th:if="${param.deconnecte}" class="message message-succes">
-            Vous avez été déconnecté.
+            <p class="connexion-resume">
+                Plateforme de gestion des coûts de production dédiée aux ateliers de menuiserie au Bénin.
+                Suivez vos stocks de matières premières, maîtrisez le coût de revient de chaque meuble et pilotez vos dépenses en FCFA.
+            </p>
+
+            <ul class="connexion-points">
+                <li>Suivi des achats, des alertes de stock et du coût unitaire moyen pondéré.</li>
+                <li>Calcul précis des fabrications : matières consommées, main-d'œuvre et charges.</li>
+                <li>Tableau de bord mensuel séparant coûts de production et charges générales.</li>
+            </ul>
         </div>
 
-        <form th:action="@{/connexion}" method="post">
-            <div class="champ">
-                <label for="email">Adresse de connexion</label>
-                <input type="email" id="email" name="email" required autofocus>
+        <div class="connexion-pied-gauche">
+            <span th:text="${atelier.nomAtelier + ' (' + atelier.commune + ')'}">Atelier</span>
+        </div>
+    </section>
+
+    <section class="connexion-droite">
+        <div class="carte-connexion">
+            <h2>Connexion</h2>
+            <p class="sous-titre">Accédez à l'espace de gestion de l'atelier.</p>
+
+            <div th:if="${param.erreur}" class="message message-erreur">
+                Adresse de connexion ou mot de passe incorrect.
             </div>
-            <div class="champ">
-                <label for="motDePasse">Mot de passe</label>
-                <input type="password" id="motDePasse" name="motDePasse" required>
+            <div th:if="${param.deconnecte}" class="message message-succes">
+                Vous avez été déconnecté.
             </div>
-            <div class="actions-formulaire">
-                <button type="submit" class="btn btn-principal" style="width: 100%;">Se connecter</button>
-            </div>
-        </form>
-    </div>
+
+            <form th:action="@{/connexion}" method="post">
+                <div class="champ">
+                    <label for="email">Adresse de connexion</label>
+                    <input type="email" id="email" name="email" required autofocus placeholder="exemple@mobilier.bj">
+                </div>
+                <div class="champ">
+                    <label for="motDePasse">Mot de passe</label>
+                    <input type="password" id="motDePasse" name="motDePasse" required placeholder="Votre mot de passe">
+                </div>
+                <div class="actions-formulaire">
+                    <button type="submit" class="btn btn-principal" style="width: 100%;">Se connecter</button>
+                </div>
+            </form>
+        </div>
+    </section>
 </div>
 </body>
 </html>

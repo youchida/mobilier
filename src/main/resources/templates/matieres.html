@@ -12,8 +12,13 @@
     <aside th:replace="~{fragments/mise-en-page :: sidebar('matieres')}"></aside>
 
     <main class="contenu-principal">
-        <div class="entete-page">
-            <h1>Matières premières</h1>
+        <div class="banniere-visuelle" style="background-image: url('/images/bois-stock.jpg');">
+            <div class="banniere-contenu">
+                <div>
+                    <h1>Matières premières</h1>
+                    <p>Gestion du bois, de la quincaillerie, des finitions et des seuils d'alerte de stock.</p>
+                </div>
+            </div>
         </div>
 
         <div th:replace="~{fragments/mise-en-page :: messages}"></div>

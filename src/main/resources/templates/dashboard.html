@@ -12,10 +12,12 @@
     <aside th:replace="~{fragments/mise-en-page :: sidebar('dashboard')}"></aside>
 
     <main class="contenu-principal">
-        <div class="entete-page">
-            <div>
-                <h1>Tableau de bord</h1>
-                <p class="sous-titre">Mois en cours : <strong th:text="${indicateurs.moisCourant}">mois</strong></p>
+        <div class="banniere-visuelle" style="background-image: url('/images/dashboard-hero.jpg');">
+            <div class="banniere-contenu">
+                <div>
+                    <h1>Tableau de bord</h1>
+                    <p>Mois en cours : <strong th:text="${indicateurs.moisCourant}">mois</strong></p>
+                </div>
             </div>
         </div>
 

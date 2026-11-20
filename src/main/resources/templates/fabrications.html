@@ -12,8 +12,13 @@
     <aside th:replace="~{fragments/mise-en-page :: sidebar('fabrications')}"></aside>
 
     <main class="contenu-principal">
-        <div class="entete-page">
-            <h1>Fabrications</h1>
+        <div class="banniere-visuelle" style="background-image: url('/images/fabrication-atelier.jpg');">
+            <div class="banniere-contenu">
+                <div>
+                    <h1>Fabrications</h1>
+                    <p>Suivi des lots en cours, consommations de matières, main-d'œuvre et coûts de revient.</p>
+                </div>
+            </div>
         </div>
 
         <div th:replace="~{fragments/mise-en-page :: messages}"></div>
@@ -28,7 +33,7 @@
                     <div class="champ">
                         <label for="modeleId">Modèle de meuble</label>
                         <select id="modeleId" name="modeleId" required>
-                            <option th:each="mod : ${modeles}" th:value="${mod.id}" th:text="${mod.code + ' - ' + mod.nom}"></option>
+                            <option th:each="modele : ${modeles}" th:value="${modele.id}" th:text="${modele.code + ' - ' + modele.nom}"></option>
                         </select>
                     </div>
                     <div class="champ">
@@ -52,9 +57,9 @@
 
         <div class="carte">
             <h2>Liste des fabrications</h2>
-            <p th:if="${#lists.isEmpty(fabrications)}" class="vide">Aucune fabrication enregistrée.</p>
+            <p th:if="${#lists.isEmpty(lignes)}" class="vide">Aucune fabrication enregistrée.</p>
 
-            <div th:if="${!#lists.isEmpty(fabrications)}" class="conteneur-tableau">
+            <div th:if="${!#lists.isEmpty(lignes)}" class="conteneur-tableau">
                 <table>
                     <thead>
                     <tr>
@@ -69,21 +74,21 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="f : ${fabrications}">
-                        <td th:text="${#temporals.format(f.dateDebut, 'dd/MM/yyyy')}">01/01/2026</td>
-                        <td th:text="${f.modele.code + ' - ' + f.modele.nom}">Modèle</td>
-                        <td class="nombre" th:text="${f.quantitePrevue}">1</td>
-                        <td class="nombre" th:text="${f.quantiteProduite != null ? f.quantiteProduite : '-'}">-</td>
-                        <td th:text="${f.dateFin != null ? #temporals.format(f.dateFin, 'dd/MM/yyyy') : '-'}">-</td>
+                    <tr th:each="ligne : ${lignes}">
+                        <td th:text="${#temporals.format(ligne.fabrication.dateDebut, 'dd/MM/yyyy')}">01/01/2026</td>
+                        <td th:text="${ligne.fabrication.modele.code + ' - ' + ligne.fabrication.modele.nom}">Modèle</td>
+                        <td class="nombre" th:text="${ligne.fabrication.quantitePrevue}">1</td>
+                        <td class="nombre" th:text="${ligne.fabrication.quantiteProduite != null ? ligne.fabrication.quantiteProduite : '-'}">-</td>
+                        <td th:text="${ligne.fabrication.dateFin != null ? #temporals.format(ligne.fabrication.dateFin, 'dd/MM/yyyy') : '-'}">-</td>
                         <td>
-                            <span th:if="${f.terminee}" class="badge badge-vert">Terminée</span>
-                            <span th:if="${!f.terminee}" class="badge badge-jaune">En cours</span>
+                            <span th:if="${ligne.fabrication.terminee}" class="badge badge-vert">Terminée</span>
+                            <span th:if="${!ligne.fabrication.terminee}" class="badge badge-jaune">En cours</span>
                         </td>
-                        <td class="nombre" th:text="${#numbers.formatDecimal(coutsTotaux[f.id], 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
+                        <td class="nombre" th:text="${#numbers.formatDecimal(ligne.coutTotal, 1, 'WHITESPACE', 0, 'COMMA') + ' FCFA'}">0 FCFA</td>
                         <td>
                             <div class="actions-ligne">
-                                <a th:href="@{/fabrications/{id}(id=${f.id})}" class="btn btn-principal btn-petit">Détail</a>
-                                <form th:if="${suppressionsPossibles[f.id]}" th:action="@{/fabrications/{id}/supprimer(id=${f.id})}" method="post">
+                                <a th:href="@{/fabrications/{id}(id=${ligne.fabrication.id})}" class="btn btn-principal btn-petit">Détail</a>
+                                <form th:if="${ligne.peutSupprimer}" th:action="@{/fabrications/{id}/supprimer(id=${ligne.fabrication.id})}" method="post">
                                     <button type="submit" class="btn btn-danger btn-petit">Supprimer</button>
                                 </form>
                             </div>

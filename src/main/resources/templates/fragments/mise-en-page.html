@@ -3,14 +3,24 @@
 <body>
 
 <div th:fragment="topbarMobile" class="topbar-mobile">
-    <span class="topbar-mobile-titre">Suivi Coûts Mobilier</span>
+    <div class="topbar-mobile-marque">
+        <div class="logo-badge" style="width: 34px; height: 34px;">
+            <img th:src="@{/images/logo.jpg}" alt="Logo">
+        </div>
+        <span class="topbar-mobile-titre">Suivi Coûts Mobilier</span>
+    </div>
     <button type="button" class="btn-menu-mobile" onclick="basculerMenu()">Menu</button>
 </div>
 
 <aside th:fragment="sidebar(pageActive)" id="sidebar" class="sidebar">
     <div>
         <div class="sidebar-entete">
-            <div class="sidebar-titre">Suivi Coûts Mobilier</div>
+            <div class="sidebar-marque">
+                <div class="logo-badge">
+                    <img th:src="@{/images/logo.jpg}" alt="Logo">
+                </div>
+                <div class="sidebar-titre">Suivi Coûts Mobilier</div>
+            </div>
             <div class="sidebar-atelier" th:text="${atelier.nomAtelier}">Atelier</div>
             <div class="sidebar-commune" th:text="${atelier.commune}">Commune</div>
         </div>
